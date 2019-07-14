@@ -196,7 +196,14 @@ class ProductAdapter extends AbstractMagentoAdapter {
       if (!context.use_paging) this.page_count = 1; // process only one page - used for partitioning purposes
 
       logger.debug(`Using specific paging options from adapter context: ${context.page} / ${context.page_size}`);
-
+      console.log("SEARCH")
+      console.log(searchCriteria)
+      console.log("PAGE")
+      console.log(context.page)
+      console.log("PAGESIZE")
+      console.log(context.page_size)
+      console.log("QUERY")
+      console.log(query)
       return this.api.products.list(util.format(searchCriteria, context.page, context.page_size) + (query ? '&' + query : '')).catch((err) => {
         throw new Error(err);
       });
