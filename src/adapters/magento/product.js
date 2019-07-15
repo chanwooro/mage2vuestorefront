@@ -118,6 +118,8 @@ class ProductAdapter extends AbstractMagentoAdapter {
               this.api.products.renderList(query, this.config.magento.storeId, this.config.magento.currencyCode).then(renderedProducts => {
                 context.renderedProducts = renderedProducts
                 for (let product of result.items) {
+                  console.log("COMMENCE THIS ITEM")
+                  console.log(product.id)
                   const productAdditionalInfo = renderedProducts.items.find(p => p.id === product.id)
 
                   if (productAdditionalInfo && productAdditionalInfo.price_info) {
