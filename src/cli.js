@@ -34,7 +34,7 @@ const reindexAttributes = (adapterName, removeNonExistent) => {
           adapter.cleanUp(tsk);
         }
   
-        logger.info('Task done! Exiting in 30s...');
+        // logger.info('Task done! Exiting in 30s...');
         setTimeout(process.exit, TIME_TO_EXIT); // let ES commit all changes made
         resolve();
       }
@@ -58,7 +58,7 @@ const reindexReviews = (adapterName, removeNonExistent) => {
           adapter.cleanUp(tsk);
         }
   
-        logger.info('Task done! Exiting in 30s...');
+        // logger.info('Task done! Exiting in 30s...');
         setTimeout(process.exit, TIME_TO_EXIT); // let ES commit all changes made
         resolve();
       }
@@ -83,7 +83,7 @@ const reindexBlocks = (adapterName, removeNonExistent) => {
           adapter.cleanUp(tsk);
         }
 
-        logger.info('Task done! Exiting in 30s...');
+        // logger.info('Task done! Exiting in 30s...');
         setTimeout(process.exit, TIME_TO_EXIT); // let ES commit all changes made
         resolve();
       }
@@ -133,7 +133,7 @@ const reindexCategories = (adapterName, removeNonExistent, extendedCategories, g
           adapter.cleanUp(tsk);
         }
 
-        logger.info('Task done! Exiting in 30s...');
+        // logger.info('Task done! Exiting in 30s...');
         setTimeout(process.exit, TIME_TO_EXIT); // let ES commit all changes made
         resolve();
       }
@@ -155,7 +155,7 @@ const reindexTaxRules = (adapterName, removeNonExistent) => {
           adapter.cleanUp(tsk);
         }
   
-        logger.info('Task done! Exiting in 30s...');
+        // logger.info('Task done! Exiting in 30s...');
         setTimeout(process.exit, TIME_TO_EXIT); // let ES commit all changes made
         resolve();
       }
@@ -168,7 +168,7 @@ const reindexProductCategories = (adapterName) => {
     let adapter = factory.getAdapter(adapterName, 'productcategories');
     adapter.run({
       done_callback: () => {
-        logger.info('Task done! Exiting in 30s...');
+        // logger.info('Task done! Exiting in 30s...');
         setTimeout(process.exit, TIME_TO_EXIT); // let ES commit all changes made
         resolve();
       }
@@ -181,7 +181,7 @@ function cleanup(adapterName, cleanupType, transactionKey) {
   let tsk = transactionKey;
 
   if (tsk) {
-    logger.info('Cleaning up for TRANSACTION KEY = ' + tsk);
+    // logger.info('Cleaning up for TRANSACTION KEY = ' + tsk);
     adapter.connect
     adapter.cleanUp(tsk);
   } else {
@@ -196,14 +196,14 @@ function reindexProducts(adapterName, removeNonExistent, partitions, partitionSi
   let adapter = factory.getAdapter(adapterName, 'product');
 
   if (updatedAfter) {
-    logger.info('Delta indexer started for', updatedAfter)
+    // logger.info('Delta indexer started for', updatedAfter)
   }
   let tsk = new Date().getTime();
 
   if (partitions > 1 && adapter.isFederated()) { // standard case
     let partition_count = partitions;
 
-    logger.info(`Running in MPM (Multi Process Mode) with partitions count = ${partition_count}`);
+    // logger.info(`Running in MPM (Multi Process Mode) with partitions count = ${partition_count}`);
 
     adapter.getTotalCount({ updated_after: updatedAfter }).then((result) => {
 
@@ -214,21 +214,21 @@ function reindexProducts(adapterName, removeNonExistent, partitions, partitionSi
       let transaction_key = new Date().getTime();
 
       if (initQueue) {
-        logger.info('Propagating job queue... ');
+        // logger.info('Propagating job queue... ');
 
         for (let i = 1; i <= page_count; i++) {
-          logger.debug(`Adding job for: ${i} / ${page_count}, page_size = ${page_size}`);
+          // logger.debug(`Adding job for: ${i} / ${page_count}, page_size = ${page_size}`);
           queue.createJob('products', { page_size: page_size, page: i, updated_after: updatedAfter }).save();
         }
       } else {
-        logger.info('Not propagating queue - only worker mode!');
+        // logger.info('Not propagating queue - only worker mode!');
       }
 
       // TODO: separate the execution part to run in multi-tenant env
       queue.process('products', partition_count, (job, done) => {
         let adapter = factory.getAdapter(adapterName, 'product');
         if (job && job.data.page && job.data.page_size) {
-          logger.info(`Processing job: ${job.data.page}`);
+          // logger.info(`Processing job: ${job.data.page}`);
 
           adapter.run({
             transaction_key: transaction_key,
@@ -237,7 +237,7 @@ function reindexProducts(adapterName, removeNonExistent, partitions, partitionSi
             parent_sync: job.data.updatedAfter !== null,
             updated_after: job.data.updatedAfter,
             done_callback: () => {
-              logger.info('Task done!');
+              // logger.info('Task done!');
               return done();
             }
           });
@@ -250,12 +250,12 @@ function reindexProducts(adapterName, removeNonExistent, partitions, partitionSi
             if (total == 0) {
 
               if (removeNonExistent) {
-                logger.info('CleaningUp products!');
+                // logger.info('CleaningUp products!');
                 let adapter = factory.getAdapter(adapterName, 'product');
                 adapter.cleanUp(transaction_key);
               }
 
-              logger.info('Queue processed. Exiting!');
+              // logger.info('Queue processed. Exiting!');
               setTimeout(process.exit, TIME_TO_EXIT); // let ES commit all changes made
             }
           });
@@ -264,7 +264,7 @@ function reindexProducts(adapterName, removeNonExistent, partitions, partitionSi
     });
 
   } else {
-    logger.info('Running in SPM (Single Process Mode)');
+    // logger.info('Running in SPM (Single Process Mode)');
     let context = {
       page: page !== null ? parseInt(page) : null,
       page_size: partitionSize,
@@ -276,11 +276,11 @@ function reindexProducts(adapterName, removeNonExistent, partitions, partitionSi
         if (removeNonExistent) {
           adapter.cleanUp(tsk);
         }
-        logger.info('Task done! Exiting in 30s...');
+        // logger.info('Task done! Exiting in 30s...');
         setTimeout(process.exit, TIME_TO_EXIT); // let ES commit all changes made
       }
     };
-    if (page!== null) logger.info('Current page is: ', page, partitionSize)
+    // if (page!== null) logger.info('Current page is: ', page, partitionSize)
     if (skus) {
       context.skus = skus.split(','); // update individual producs
       context.parent_sync = true
@@ -298,7 +298,7 @@ function fullReindex(adapterName, removeNonExistent, partitions, partitionSize, 
     reindexCategories(adapterName, removeNonExistent, extendedCategories, generateUniqueUrlKeys), //2. It stores categories in redis cache
     reindexProductCategories(adapterName) // 3. It stores product/cateogry links in redis cache
   ]).then((results) => {
-    logger.info('Starting full products reindex!');
+    // logger.info('Starting full products reindex!');
     reindexProducts(adapterName, removeNonExistent, partitions, partitionSize, initQueue, skus); //4. It indexes all the products
   }).catch((err) => {
     logger.error(err);
@@ -311,7 +311,7 @@ function fullReindex(adapterName, removeNonExistent, partitions, partitionSize, 
  */
 function runProductsworker(adapterName, partitions) {
 
-  logger.info('Starting `productsworker` worker. Waiting for jobs ...');
+  // logger.info('Starting `productsworker` worker. Waiting for jobs ...');
   let partition_count = partitions;
 
   // TODO: separte the execution part to run in multi-tenant env
@@ -319,7 +319,7 @@ function runProductsworker(adapterName, partitions) {
 
     if (job && job.data.skus && Array.isArray(job.data.skus)) {
 
-      logger.info('Starting product pull job for ' + job.data.skus.join(','));
+      // logger.info('Starting product pull job for ' + job.data.skus.join(','));
 
       let adapter = factory.getAdapter(job.data.adapter ? job.data.adapter : adapterName, 'product');
 
@@ -327,7 +327,7 @@ function runProductsworker(adapterName, partitions) {
         skus: job.data.skus,
         parent_sync: true,
         done_callback: () => {
-          logger.info('Task done!');
+          // logger.info('Task done!');
           return done();
         }
       });
@@ -420,7 +420,7 @@ program
       indexMeta = jsonFile.readFileSync(INDEX_META_PATH)
       updatedAfter = new Date(indexMeta.lastIndexDate)
     } catch (err) {
-      console.log('Seems like first time run!')
+      // console.log('Seems like first time run!')
       updatedAfter = null // full reindex
     }
 
@@ -430,7 +430,8 @@ program
       indexMeta.lastIndexDate = new Date()
       jsonFile.writeFile(INDEX_META_PATH, indexMeta)
     } catch (err) {
-      console.log('Error writing index meta!', err)
+      logger.error('Error writing index meta!', err)
+      // console.log('Error writing index meta!', err)
     }
   })
 
