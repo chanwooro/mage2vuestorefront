@@ -30,13 +30,13 @@ module.exports = {
   },
 
   magento: {
-    url: process.env.MAGENTO_URL || 'http://magento2.demo-1.divante.pl/rest/',
+    url: process.env.MAGENTO_URL || 'https://magento.vendella.edge.incbtr.com/rest/',
     consumerKey: process.env.MAGENTO_CONSUMER_KEY || 'opxctd7tikpiyvtdia7jvd8dksfga8rz',
     consumerSecret: process.env.MAGENTO_CONSUMER_SECRET || '0hxs8hm0zwi6hj1dh24w0tuapfvw4eqw',
     accessToken: process.env.MAGENTO_ACCESS_TOKEN || 'q3f09regsceyt880rb2ubac59gztmboq',
     accessTokenSecret: process.env.MAGENTO_ACCESS_TOKEN_SECRET || 'x058bmahy83jc6zercyddkeagr3ictw2',
     storeId: process.env.MAGENTO_STORE_ID || 1,
-    currencyCode: process.env.MAGENTO_CURRENCY_CODE || 'USD',
+    currencyCode: process.env.MAGENTO_CURRENCY_CODE || 'NZD',
     msi: { enabled: process.env.MAGENTO_MSI_ENABLED || false, stockId: process.env.MAGENTO_MSI_STOCK_ID || 1 }
   },
 
